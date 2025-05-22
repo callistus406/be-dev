@@ -3,6 +3,7 @@ import {
   addUserService,
   getUserByIdService,
   getUsersService,
+  loginService,
 } from "../service/app.service";
 
 export const sayhello = (req: any, res: Response) => {
@@ -13,7 +14,7 @@ export const getUsersController = (req: any, res: Response) => {
   const response = getUsersService();
 
   //send response to user
-  res.status(400).json({
+  res.status(200).json({
     message: "Request successful",
     data: response,
   });
@@ -47,6 +48,21 @@ export const getUserByIdController = (req: Request, res: Response) => {
       message: "Request successful",
       data: response,
     });
+  } catch (error: any) {
+    res.status(400).json({
+      message: "Bad Request",
+      data: error.message,
+    });
+  }
+};
+
+export const loginController = (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    const response = loginService(email, password);
+
+    res.status(200).json(response);
   } catch (error: any) {
     res.status(400).json({
       message: "Bad Request",

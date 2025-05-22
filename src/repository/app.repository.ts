@@ -42,3 +42,13 @@ export const getLastUser = () => {
 
   return lastUser;
 };
+
+export const getUserByEmail = (email: string) => {
+  const user = dbUsers.find((user) => user.email === email);
+
+  if (!user) {
+    return null;
+  } else {
+    return user;
+  }
+};
