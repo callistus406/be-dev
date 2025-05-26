@@ -4,7 +4,7 @@ export const dbUsers = [
     name: "michael monday",
     password: "123#",
     age: 23,
-    email: "user@gmail.com",
+    email: "qwerty@gmail.com",
     username: "mack",
   },
 ];

@@ -1,3 +1,4 @@
+import { JWT_SECRETE } from "../config/system-variables";
 import {
   getUsers,
   addUser,
@@ -6,6 +7,8 @@ import {
   getUserByEmail,
 } from "../repository/app.repository";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+
 export interface IAddUser {
   name: string;
   password: string;
@@ -14,12 +17,13 @@ export interface IAddUser {
   username: string;
 }
 
-const jwtSecrete = "qwerty78uytrertyuytryuiuytyuiu";
+const jwtSecrete = process.env.JWT_SECRETE as string;
+
 export const getUsersService = () => {
   return getUsers();
 };
 
-export const addUserService = (user: IAddUser) => {
+export const addUserService = async (user: IAddUser) => {
   if (
     !user.age ||
     !user.name ||
@@ -33,6 +37,11 @@ export const addUserService = (user: IAddUser) => {
   if (user.password.length < 3) {
     throw new Error("Password cannot be less than 3 characters");
   }
+
+  //hash password
+  const hashedPassword = await bcrypt.hash(user.password, 10);
+  console.log(hashedPassword);
+
   // find the last object in the db
   const lastUser = getLastUser();
 
@@ -41,7 +50,7 @@ export const addUserService = (user: IAddUser) => {
   const newId = lastUser.id + 1;
 
   // use the id for the next user
-  const nextUser = { ...user, id: newId };
+  const nextUser = { ...user, id: newId, password: hashedPassword };
   return addUser(nextUser);
 };
 
@@ -61,7 +70,7 @@ export const getUserByIdService = (id: string) => {
 
 //check if passswd matches constraint
 
-export const loginService = (email: string, password: string) => {
+export const loginService = async (email: string, password: string) => {
   if (!email || !password) {
     throw new Error("Fields cannnot be empty");
   }
@@ -76,19 +85,30 @@ export const loginService = (email: string, password: string) => {
   if (!user) {
     throw new Error("User not found");
   }
+
+  console.log(user.password)
   // compare password
 
-  if (user.password !== password) {
-    // if error throw error
+
+  const isValid = await bcrypt.compare(password, user.password)
+
+
+  
+  if (!isValid) {
     throw new Error("Invalid password");
   }
+
+  // if (user.password !== password) {
+  //   // if error throw error
+  //   throw new Error("Invalid password");
+  // }
   const payload = {
     username: user.username,
     email: user.email,
   };
 
-  let jwtToken = jwt.sign(payload, jwtSecrete);
-  console.log(jwtToken);
+  console.log(jwtSecrete);
+  let jwtToken = jwt.sign(payload, JWT_SECRETE, { expiresIn: "1m" });
 
   console.log(jwtToken);
   return {

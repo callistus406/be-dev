@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.get("/users", authMiddleware, getUsersController);
 
-router.post("/user", authMiddleware, addUserController);
+router.post("/user", addUserController);
 router.get("/user/:userId", authMiddleware, getUserByIdController);
 router.post("/login", loginController);
 

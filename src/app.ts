@@ -1,7 +1,10 @@
 import express, { Response } from "express";
 import router from "./routes/app.route";
 import { logger } from "./middleware/logger.middleware";
+// import dotenv from "dotenv";
+// dotenv.config();
 const app = express();
+
 
 const port = 4000;
 
