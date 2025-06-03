@@ -2,6 +2,7 @@ import { JWT_SECRETE } from "../config/system-variables";
 import { AppRepository } from "../repository/app.repository";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { Types } from "mongoose";
 
 export interface IAddUser {
   email: string;
@@ -27,10 +28,10 @@ export interface IAddUser {
 const jwtSecrete = process.env.JWT_SECRETE as string;
 
 export class AppService {
-  static getUsersService = () => {
-    return AppRepository.getUsers();
+  static getUsersService = async () => {
+    return  await AppRepository.getUsers();
   };
-
+  //=============================|| ADD USER SERVICE ||==============================
   static addUserService = async (user: IAddUser) => {
     if (!user.age || !user.name || !user.email || !user.password) {
       throw new Error("All fields are required");
@@ -40,32 +41,30 @@ export class AppService {
       throw new Error("Password cannot be less than 3 characters");
     }
 
+    //user exists
+
+    const isFound = await AppRepository.getUserByEmail(user.email);
+
+    if (isFound) {
+      throw new Error("Email exists");
+    }
+
     //hash password
     const hashedPassword = await bcrypt.hash(user.password, 10);
     console.log(hashedPassword);
 
-    // find the last object in the db
-    const lastUser = AppRepository.getLastUser();
-
-    //check the id
-    // increment the id by 1
-    const newId = lastUser.id + 1;
-
     // use the id for the next user
-    const nextUser = { ...user, id: newId, password: hashedPassword };
+    const nextUser = { ...user, password: hashedPassword };
     return AppRepository.addUser(nextUser);
   };
 
-  static getUserByIdService = (id: string) => {
+  static getUserByIdService = async (id: string) => {
     if (!id) {
       throw new Error("Id cannot be empty");
     }
-    //   if (isNaN(Number(id))) {
-    //     throw new Error("Id must be a number");
-    //   }
-    const convId = parseInt(id);
 
-    const response = AppRepository.getUserById(convId);
+    const mongoId = new Types.ObjectId(id);
+    const response = await AppRepository.getUserById(mongoId);
 
     return response;
   };
@@ -80,7 +79,7 @@ export class AppService {
     }
 
     //get user by email
-    const user = AppRepository.getUserByEmail(email);
+    const user = await AppRepository.getUserByEmail(email);
 
     if (!user) {
       throw new Error("User not found");
@@ -115,31 +114,27 @@ export class AppService {
     // return success msg
   };
 
+  static getUserLocation = (userId: string) => {
+    const conv = parseInt(userId);
 
-  static getUserLocation = (userId: string)=>{
-  
-    const conv = parseInt(userId)
+    const response = AppRepository.getUserLocation(conv);
 
-    const response = AppRepository.getUserLocation(conv)
+    return response;
+  };
 
-    return response
-  }
-  
-  static searchByUsername = (username: string,gender:string) => {
-  const query:any = []
+  static searchByUsername = (username: string, gender: string) => {
+    const query: any = [];
     if (username) {
-      query.push(username)
+      query.push(username);
     }
     if (gender) {
-      query.push(gender)
-      
+      query.push(gender);
     }
-
 
     // const response = AppRepository.searchByUsername(query)
 
-    return "response"
-  }
+    return "response";
+  };
 }
 
 //check if passswd matches constraint

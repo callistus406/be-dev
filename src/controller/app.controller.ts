@@ -4,8 +4,8 @@ AppService
 } from "../service/app.service";
 
 export class AppController {
-  static getUsers = (req: any, res: Response) => {
-    const response = AppService.getUsersService();
+  static getUsers = async (req: any, res: Response) => {
+    const response = await AppService.getUsersService();
 
     //send response to user
     res.status(200).json({
@@ -32,11 +32,11 @@ export class AppController {
     }
   };
 
-  static getUserById = (req: Request, res: Response) => {
+  static getUserById = async (req: Request, res: Response) => {
     try {
       const id = req.params.userId;
 
-      const response = AppService.getUserByIdService(id);
+      const response = await AppService.getUserByIdService(id);
 
       res.status(200).json({
         message: "Request successful",
