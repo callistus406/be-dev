@@ -11,6 +11,7 @@ router.get("/user/search", AppController.searchByUsername);
 
 
 router.get("/user/:userId", AppController.getUserById);
+router.delete("/user/:id", AppController.deleteUserById);
 router.get("/user/:userId/location", AppController.getUserLocation);
 router.post("/login", AppController.login);
 

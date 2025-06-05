@@ -29,7 +29,7 @@ const jwtSecrete = process.env.JWT_SECRETE as string;
 
 export class AppService {
   static getUsersService = async () => {
-    return  await AppRepository.getUsers();
+    return await AppRepository.getUsers();
   };
   //=============================|| ADD USER SERVICE ||==============================
   static addUserService = async (user: IAddUser) => {
@@ -135,6 +135,29 @@ export class AppService {
 
     return "response";
   };
+
+  static async deleteUserById(id: string) {
+    //validate the id
+    // check falsy value
+    if (!id) throw new Error("Id is required");
+
+    // check if id is a mongodb id
+    if (!Types.ObjectId.isValid(id))
+      throw new Error("Id is not a valid mongo id");
+
+    // check id user exists
+
+    const objectId = new Types.ObjectId(id);
+    const isFound = await AppRepository.findUserById(objectId);
+    if (!isFound) throw new Error("Record not found");
+    // delete user
+
+    const isDeleted = await AppRepository.deleteUserById(objectId);
+
+    if (!isDeleted) throw new Error("Unable to delete record");
+
+    return `${isFound.name} account has been deleted!`;
+  }
 }
 
 //check if passswd matches constraint

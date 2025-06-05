@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import {
-AppService
-} from "../service/app.service";
+import { AppService } from "../service/app.service";
 
 export class AppController {
   static getUsers = async (req: any, res: Response) => {
@@ -64,13 +62,12 @@ export class AppController {
       });
     }
   };
-  
-  
-  static getUserLocation =  (req: Request, res: Response) => {
+
+  static getUserLocation = (req: Request, res: Response) => {
     try {
       const { userId } = req.params;
 
-      const response =  AppService.getUserLocation(userId);
+      const response = AppService.getUserLocation(userId);
 
       res.status(200).json(response);
     } catch (error: any) {
@@ -80,12 +77,30 @@ export class AppController {
       });
     }
   };
-  
+
   static searchByUsername = (req: Request, res: Response) => {
     try {
-      const { username ,gender} = req.query;
+      const { username, gender } = req.query;
 
-      const response =  AppService.searchByUsername(username as string,gender as string);
+      const response = AppService.searchByUsername(
+        username as string,
+        gender as string
+      );
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      res.status(400).json({
+        message: "Bad Request",
+        data: error.message,
+      });
+    }
+  };
+
+  static deleteUserById = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+
+      const response = await AppService.deleteUserById(id);
 
       res.status(200).json(response);
     } catch (error: any) {

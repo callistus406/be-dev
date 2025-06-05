@@ -36,20 +36,18 @@ export class AppRepository {
     return response;
   };
 
-  static getUserById = (id: Types.ObjectId) => {
-    const response = userModel.findById(id).select("-password -location -__v");
+  static getUserById = async (id: Types.ObjectId) => {
+    const response = await userModel
+      .findById(id)
+      .select("-password -location -__v");
 
     return response;
   };
 
-  static getLastUser = () => {
-    const lastUser = dbUsers[dbUsers.length - 1];
-
-    return lastUser;
-  };
-
   static getUserByEmail = async (email: string): Promise<any> => {
     const user = await userModel.findOne({ email: email });
+
+    if (!user) return null;
 
     return user;
   };
@@ -64,4 +62,16 @@ export class AppRepository {
       state: response?.location.state,
     };
   };
+
+  static async findUserById(userId: Types.ObjectId) {
+    const response = await userModel.findById(userId);
+
+    if (!response) return null;
+    return response;
+  }
+
+  static async deleteUserById(id: Types.ObjectId) {
+    const response = await userModel.findByIdAndDelete(id);
+    return response;
+  }
 }
