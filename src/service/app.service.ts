@@ -33,14 +33,6 @@ export class AppService {
   };
   //=============================|| ADD USER SERVICE ||==============================
   static addUserService = async (user: IAddUser) => {
-    if (!user.age || !user.name || !user.email || !user.password) {
-      throw new Error("All fields are required");
-    }
-
-    if (user.password.length < 3) {
-      throw new Error("Password cannot be less than 3 characters");
-    }
-
     //user exists
 
     const isFound = await AppRepository.getUserByEmail(user.email);
@@ -70,14 +62,6 @@ export class AppService {
   };
 
   static loginService = async (email: string, password: string) => {
-    if (!email || !password) {
-      throw new Error("Fields cannnot be empty");
-    }
-
-    if (!email.includes("@")) {
-      throw new Error("Email is not a valid email address");
-    }
-
     //get user by email
     const user = await AppRepository.getUserByEmail(email);
 
@@ -94,10 +78,6 @@ export class AppService {
       throw new Error("Invalid password");
     }
 
-    // if (user.password !== password) {
-    //   // if error throw error
-    //   throw new Error("Invalid password");
-    // }
     const payload = {
       username: user.name,
       email: user.email,
@@ -157,6 +137,10 @@ export class AppService {
     if (!isDeleted) throw new Error("Unable to delete record");
 
     return `${isFound.name} account has been deleted!`;
+  }
+
+  static async updateUsers() {
+    return await AppRepository.updatedUsers();
   }
 }
 

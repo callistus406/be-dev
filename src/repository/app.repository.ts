@@ -74,4 +74,15 @@ export class AppRepository {
     const response = await userModel.findByIdAndDelete(id);
     return response;
   }
+
+  static async updatedUsers() {
+    const response = await userModel.updateMany(
+      {},
+      {
+        name: "qwertyu",
+        gender: "male",
+      }
+    );
+    return response;
+  }
 }

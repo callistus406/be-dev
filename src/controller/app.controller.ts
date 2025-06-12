@@ -110,4 +110,19 @@ export class AppController {
       });
     }
   };
+
+  static updateUsers = async (req: Request, res: Response) => {
+    try {
+      const response = await AppService.updateUsers();
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      res.status(400).json({
+        message: "Bad Request",
+        data: error.message,
+      });
+    }
+  };
+
 }
+
