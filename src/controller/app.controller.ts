@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { AppService } from "../service/app.service";
+import { asyncWrapper } from "../middleware/asyncWrapper";
 
 export class AppController {
   static getUsers = async (req: any, res: Response) => {
@@ -48,20 +49,13 @@ export class AppController {
     }
   };
 
-  static login = async (req: Request, res: Response) => {
-    try {
-      const { email, password } = req.body;
+  static login = asyncWrapper(async (req: Request, res: Response) => {
+    const { email, password } = req.body;
 
-      const response = await AppService.loginService(email, password);
+    const response = await AppService.loginService(email, password);
 
-      res.status(200).json(response);
-    } catch (error: any) {
-      res.status(400).json({
-        message: "Bad Request",
-        data: error.message,
-      });
-    }
-  };
+    res.status(200).json(response);
+  });
 
   static getUserLocation = (req: Request, res: Response) => {
     try {
@@ -96,33 +90,18 @@ export class AppController {
     }
   };
 
-  static deleteUserById = async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
+  static deleteUserById = asyncWrapper(async (req: Request, res: Response) => {
+    const { id } = req.params;
 
-      const response = await AppService.deleteUserById(id);
+    const response = await AppService.deleteUserById(id);
 
-      res.status(200).json(response);
-    } catch (error: any) {
-      res.status(400).json({
-        message: "Bad Request",
-        data: error.message,
-      });
-    }
-  };
+    res.status(200).json(response);
+  });
 
-  static updateUsers = async (req: Request, res: Response) => {
-    try {
-      const response = await AppService.updateUsers();
 
-      res.status(200).json(response);
-    } catch (error: any) {
-      res.status(400).json({
-        message: "Bad Request",
-        data: error.message,
-      });
-    }
-  };
 
+  static updateUsers = asyncWrapper(async (req: Request, res: Response) => {
+    const response = await AppService.updateUsers();
+    res.status(200).json(response);
+  });
 }
-

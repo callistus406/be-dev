@@ -23,3 +23,13 @@ export default router;
 // className.methodName
 
 // username, email , age , firstname, lastname
+
+// /user?name=mom&pet=dog
+// /user/:userId
+// req.body
+// req.param
+
+// const { name, pet} = req.query
+
+
+

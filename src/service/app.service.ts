@@ -3,6 +3,8 @@ import { AppRepository } from "../repository/app.repository";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { Types } from "mongoose";
+import { throwCustomError } from "../middleware/errorHandler.midleware";
+import axios from "axios";
 
 export interface IAddUser {
   email: string;
@@ -38,14 +40,12 @@ export class AppService {
     const isFound = await AppRepository.getUserByEmail(user.email);
 
     if (isFound) {
-      throw new Error("Email exists");
+      throw throwCustomError("Email exists", 409);
     }
 
-    //hash password
     const hashedPassword = await bcrypt.hash(user.password, 10);
-    console.log(hashedPassword);
 
-    // use the id for the next user
+    if (!hashedPassword) throw throwCustomError("Something went wrong", 500);
     const nextUser = { ...user, password: hashedPassword };
     return AppRepository.addUser(nextUser);
   };
@@ -66,16 +66,13 @@ export class AppService {
     const user = await AppRepository.getUserByEmail(email);
 
     if (!user) {
-      throw new Error("User not found");
+      throw throwCustomError("invalid credentials", 401);
     }
-
-    console.log(user.password);
-    // compare password
 
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
-      throw new Error("Invalid password");
+      throw throwCustomError("Invalid email or password", 401);
     }
 
     const payload = {
@@ -86,10 +83,23 @@ export class AppService {
     console.log(jwtSecrete);
     let jwtToken = jwt.sign(payload, JWT_SECRETE, { expiresIn: "1h" });
 
+    let data;
+
+    try {
+      // hghghg
+      data = (await axios.get("https://jsonplaceholder.typicode.com/posts/iiuiuiu")).data;
+
+      console.log(data);
+    } catch (error) {
+
+      console.log(error);
+    }
+
     console.log(jwtToken);
     return {
       message: "Login successful",
       authKey: jwtToken,
+      data
     };
     // return success msg
   };
@@ -117,9 +127,7 @@ export class AppService {
   };
 
   static async deleteUserById(id: string) {
-    //validate the id
-    // check falsy value
-    if (!id) throw new Error("Id is required");
+    if (!id) throw throwCustomError("Id is required", 422);
 
     // check if id is a mongodb id
     if (!Types.ObjectId.isValid(id))
